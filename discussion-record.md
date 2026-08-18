@@ -62,6 +62,38 @@ I understood that the agent should not necessarily use one fixed threshold for e
 
 I understood that `HOLD_FOR_REVIEW` should be an actual state of the agent, rather than simply treating low confidence as approve or stop. If the evidence is weak, missing, or conflicting, the agent can hold the transaction and ask for human review instead of making an irreversible decision.
 
+## Discussion 3 — Suspicious Payment
+
+**Platform:** Reddit  
+**Community:** [community name]
+
+### My Question
+
+> transaction agent thinking
+>
+> I am building an AI agent for transactions which performs actions like approve / hold or question / stop, so I want feedback on:
+>
+> **If your bank/payment system flags a payment as suspicious, which would you prefer?**
+>
+> A) Block it immediately  
+> B) Let me confirm/verify it before blocking  
+> C) Something else — explain
+
+### Their Response
+
+They replied with a link to:
+
+https://nuez.app/
+
+### What I Understood
+
+The resource shows an example of an AI-agent financial system where transactions below a configured amount threshold can be automatically executed, while transactions above the threshold require human approval.
+
+This is relevant to my transaction agent because it gives me another example of using a **threshold + human approval** mechanism rather than automatically blocking or approving every transaction.
+
+### Design Question
+
+Could a transaction agent combine a probability/risk estimate with transaction amount and a human-review threshold?
 ---
 
 ## Other Reddit Posts
