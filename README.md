@@ -79,30 +79,32 @@ The experiment will investigate how these costs should affect the decision rule.
 
 ## Project Stage
 
-**Current Stage: Stage 3 — Research and Problem Refinement**
+Current Stage: **Stage 3 — Research and Problem Refinement**
 
-The project is currently focused on researching the transaction decision problem, identifying useful evidence, and challenging the initial assumptions about the agent.
+The project is currently focused on testing the assumptions behind the transaction decision problem and turning the initial agent model into something that can eventually be implemented and evaluated.
 
 ### Completed
 
-- Selected the Transaction Agent problem.
-- Defined the hidden states as legitimate or fraudulent.
-- Defined the initial observable transaction information.
-- Defined the available actions: approve, question/hold, or stop.
-- Defined the basic probability-based decision process.
-- Started human outreach on Reddit.
-- Created the initial research and discussion records.
+* Selected the Transaction Agent problem.
+* Defined the hidden states as legitimate or fraudulent.
+* Defined the initial observable transaction information.
+* Defined the available actions: approve, question/hold, or stop.
+* Defined the basic probability-based decision process.
+* Identified that new evidence should update the agent's belief rather than being treated as an isolated signal.
+* Identified decision cost as an important part of choosing an action.
+* Started human outreach and collected external feedback on the problem.
+* Recorded the initial research and discussion findings.
 
 ### Current Work
 
-- Research transaction fraud decision signals.
-- Continue human discussions with practitioners.
-- Examine assumptions about evidence, uncertainty, and decision costs.
-- Refine the probability model.
+* Refine which transaction signals should affect the agent's belief.
+* Examine how uncertainty and new evidence should change the decision.
+* Investigate whether a single fixed probability threshold is appropriate for every transaction.
+* Consider transaction context and decision costs when choosing between approve, hold, and stop.
+* Turn the refined decision process into a small testable agent.
 
 ### Next Stage
 
-**Stage 4 — Probability Model and Decision Rule**
+Stage 4 — **Probability Model and Decision Rule**
 
-The next stage will turn the research findings into an explicit probability model, decision thresholds, and testable cases.
-
+The next stage will turn the research findings into an explicit probability model and decision rule, followed by testable transaction cases.
