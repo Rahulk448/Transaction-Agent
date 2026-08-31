@@ -25,7 +25,7 @@ Possible future users, such as fintech researchers, fraud-risk analysts, or engi
 - Recorded human feedback that a single fixed threshold is likely insufficient because transaction context and cost of wrong decisions matter.
 - Recorded human feedback that low confidence should not be collapsed into approve or stop.
 - Completed an initial 15-case evaluation with 11 correct decisions out of 15, about 73.3% accuracy.
-- Created existing v2 / 35-test-case work that should be preserved and used as the next evaluation source.
+- Created existing v2 / 35-test-case work at `experiments/transaction_agent_test_cases_v2.csv` that should be preserved and used as the next evaluation source.
 - The original 15-case evaluation is historical baseline evidence and must not be recreated as new work.
 
 ## 4. Features - What does the MVP need?
@@ -38,7 +38,7 @@ Possible future users, such as fintech researchers, fraud-risk analysts, or engi
 - Calculate expected costs for approve, hold, and stop.
 - Support hold/question behavior when evidence is weak, missing, conflicting, or too costly to decide immediately.
 - Use customer verification or no-response/timeout as additional evidence for a follow-up belief update.
-- Evaluate the decision process against the existing v2 / 35 test cases.
+- Evaluate the decision process against the existing v2 / 35 test cases at `experiments/transaction_agent_test_cases_v2.csv`.
 - Keep the original 15-case, 73.3% result as the baseline for comparison, not as a fixture set to recreate.
 
 ## 5. Data - What are we storing?
@@ -59,9 +59,9 @@ Current and planned project data should remain local/research-oriented unless a 
 - Customer verification responses
 - Pending/timeout outcomes
 - 15-case baseline evaluation result: 11/15 correct, about 73.3%
-- Existing v2 / 35 test cases and their evaluation outputs
+- Existing v2 / 35 test cases at `experiments/transaction_agent_test_cases_v2.csv` and their evaluation outputs
 
-The exact storage format for v2 / 35 test cases is an open question unless already present in a source file not found during this adoption pass.
+The existing v2 / 35-case evaluation source is `experiments/transaction_agent_test_cases_v2.csv`. Preserve this CSV as the source of record for the next evaluation pass.
 
 ## 6. Tech - What stack are we using?
 
@@ -89,7 +89,6 @@ There is no known build command, start command, health check path, domain, datab
 
 ## Open Questions
 
-- Where is the existing v2 / 35-test-case source stored, if not in the currently visible repository files?
 - Who is the intended evaluator beyond the project builder/reviewer?
 - Should the first runnable version be a CLI, notebook, API, or small web UI?
 - Should priors, likelihoods, thresholds, and costs be hand-authored assumptions, derived from research, learned from data, or loaded from config?

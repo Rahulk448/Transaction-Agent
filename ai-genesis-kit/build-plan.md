@@ -14,7 +14,7 @@
 ## Preservation Rules
 
 - [x] 9. **Do not recreate original 15-case evaluation** - preserve the 15-case result as historical baseline evidence, not as new implementation work
-- [ ] 10. **Locate and preserve v2 cases** - identify where the existing v2 / 35 test cases live, document the source, and avoid overwriting them
+- [x] 10. **Locate and preserve v2 cases** - existing v2 / 35 test cases live at `experiments/transaction_agent_test_cases_v2.csv`; preserve this CSV as the evaluation source and avoid overwriting it
 
 ## MVP Implementation
 
@@ -25,7 +25,7 @@
 - [ ] 15. **Expected-cost decision engine** - calculate expected cost for approve, hold, and stop, then choose the lowest-cost action
 - [ ] 16. **Dynamic decision threshold behavior** - account for transaction context and cost differences so the agent does not rely on one fixed threshold for every transaction
 - [ ] 17. **Hold and verification loop** - model hold/question behavior, customer verification, no-response timeout, and a second belief update from new evidence
-- [ ] 18. **V2 evaluation runner** - evaluate the decision process against the existing v2 / 35 test cases and compare results to the 15-case 73.3% baseline
+- [ ] 18. **V2 evaluation runner** - evaluate the decision process against the existing v2 / 35 test cases at `experiments/transaction_agent_test_cases_v2.csv` and compare results to the 15-case 73.3% baseline
 - [ ] 19. **Decision trace output** - show evidence, prior belief, updated belief, expected costs, selected action, and follow-up belief updates in an inspectable report
 
 ## Later / Open

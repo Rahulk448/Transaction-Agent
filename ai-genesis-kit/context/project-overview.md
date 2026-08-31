@@ -2,147 +2,145 @@
 
 ## Product
 
-Transaction Agent is the Week One Python research/prototype project for transaction decisions under uncertainty. The original research problem is that a financial transaction arrives with incomplete information, and the true state of the transaction is hidden.
+Transaction Agent is a Python research/prototype project for transaction decisions under uncertainty. A financial transaction arrives with incomplete information, and the true state is hidden: the transaction is either legitimate or fraudulent.
 
-The hidden states are:
+The project is not a simple fraud/legitimate classifier. Its purpose is to study a sequential decision-making agent that maintains belief about the hidden state, updates that belief from evidence, compares expected decision costs, and chooses between approve, hold/question, and stop.
 
-- Legitimate.
-- Fraudulent.
+## Users
 
-The available actions are:
+The established user is the project builder/reviewer evaluating the Transaction Agent research prototype.
 
-- Approve.
-- Hold/question.
-- Stop.
+Possible future users, such as fintech researchers, fraud-risk analysts, or engineers, are not yet established as product users and remain an open question.
 
-The project is not a simple fraud/legitimate classifier. Its research direction is a decision-making agent that maintains belief about a hidden state, updates that belief from evidence, and chooses an action by considering expected cost.
+## Core Behavior
 
-## Core Decision Loop
-
-The established loop is:
+The established decision loop is:
 
 1. A transaction arrives.
 2. Available evidence is observed or extracted.
 3. The agent updates its belief about whether the transaction is legitimate or fraudulent.
-4. The agent considers decision thresholds, transaction context, and the expected cost of each action.
+4. The agent evaluates decision thresholds, transaction context, and expected cost.
 5. The agent chooses approve, hold/question, or stop.
 6. If the transaction is held, customer verification or no-response/timeout behavior can provide new evidence.
 7. New evidence flows back into another belief update and decision.
-
-This can be summarized as:
 
 ```text
 Evidence -> belief update -> expected-cost decision -> new evidence/verification -> belief update
 ```
 
-## Why Hold Is First Class
-
-Hold/question is an established action, not an error state or a vague fallback. It exists because low confidence, weak evidence, missing evidence, conflicting evidence, policy conflict, or high cost of a wrong decision should not be collapsed directly into approve or stop.
-
-The discussion record established that weak evidence should lead to review or verification when the system does not have enough proof for a stronger decision. This makes hold/question part of the agent's actual state machine and decision policy.
+Hold/question is a first-class action. It exists for weak, missing, conflicting, insufficient, or low-confidence evidence, especially when the cost of a wrong approve or stop decision is high.
 
 ## Research Direction
 
-The research direction is:
+The established research direction is:
 
-- Bayesian belief updating for maintaining `P(Legitimate | Evidence)` and `P(Fraudulent | Evidence)`.
-- Expected-cost decision making for comparing approve, hold, and stop.
-- Dynamic threshold behavior, because one fixed probability threshold is likely insufficient across different transaction contexts and transaction amounts.
-- Sequential updates, because customer verification or timeout/no-response can become new evidence.
-- Explicit evidence handling, including unusual amount, unusual merchant, unusual time, unusual location, merchant history, recent transaction activity, and customer profile behavior.
+- Bayesian belief updating for `P(Legitimate | Evidence)` and `P(Fraudulent | Evidence)`.
+- Expected-cost decision making for approve, hold, and stop.
+- Dynamic decision threshold behavior instead of one fixed threshold for every transaction.
+- Sequential updates from customer verification or timeout/no-response.
+- Explicit evidence handling for amount, time, merchant history, recent activity, location, customer profile, and historical behavior.
 
-The central research question is whether a transaction agent can make more consistent decisions by maintaining an explicit belief about the hidden state, updating that belief with new evidence, and selecting actions according to expected cost.
+LLM confidence must not be treated as the actual transaction probability. Evidence extraction must not invent missing transaction information.
 
-## Completed Work
+## Current State
 
-Completed Week One work includes:
+Completed research work includes:
 
 - Selected the Transaction Agent problem.
-- Defined the hidden states as legitimate and fraudulent.
-- Defined the available actions as approve, hold/question, and stop.
-- Identified historical transaction data and customer profile information as inputs for normal-behavior context.
-- Identified current transaction evidence as the basis for belief updates.
-- Identified Bayesian belief updates as the belief-model direction.
-- Identified expected-cost decision making as the decision-rule direction.
-- Established that additional evidence from customer verification can update the belief again.
-- Established pending/timeout as the unresolved path when the customer does not respond.
-- Recorded human feedback that transaction decisions should consider context and the cost of wrong decisions instead of relying on one fixed threshold.
-- Recorded human feedback that hold/review should be a separate state when confidence is low or evidence is insufficient.
+- Defined hidden states as legitimate and fraudulent.
+- Defined actions as approve, hold/question, and stop.
+- Established hold/question as a real action/state.
+- Defined the evidence, belief update, expected-cost decision, and follow-up evidence loop.
+- Identified historical behavior, customer profile, transaction amount, time, merchant history, recent activity, and location as relevant evidence.
+- Identified Bayesian belief updates as the intended belief model direction.
+- Identified expected-cost decision making as central to choosing between actions.
+- Recorded human feedback that one fixed threshold is likely insufficient.
+- Recorded human feedback that low confidence should not be collapsed into approve or stop.
 - Completed the original 15-case evaluation.
-- Created existing 35-test-case/v2 work for the next evaluation source.
+- Located the existing v2 / 35-case evaluation source.
 
-## Historical Evaluation Baseline
+## Evaluation Sources
 
-The original evaluation used 15 transaction test cases.
+The original 15-case evaluation is historical baseline evidence:
 
 ```text
 Correct decisions: 11 / 15
 Accuracy: 73.3%
 ```
 
-This original 15-case evaluation is historical baseline evidence and MUST NOT be recreated as new work. Future evaluation should compare against this baseline rather than rebuilding or overwriting it.
+This 15-case evaluation MUST NOT be recreated as new work. Future evaluation should compare against this baseline rather than rebuilding or overwriting it.
 
-## Current V2 Evaluation State
+The existing v2 / 35-case evaluation source is:
 
-The project history establishes that 35-test-case/v2 work already exists and should be preserved. That v2/35-case work is the next evaluation source.
+```text
+experiments/transaction_agent_test_cases_v2.csv
+```
 
-The current next step is to locate and preserve the v2/35-case source, document where it lives, and continue from there. Do not overwrite or replace it while locating it.
+Preserve this CSV as the source of record for the next evaluation pass. Do not overwrite, recreate, or replace it while implementing the evaluation runner.
 
-The exact visible file path and storage format for the v2/35-case source are not yet established in the current overview.
+## Stack
 
-## Current Prototype And Artifacts
+The repository is currently a Python research/prototype project with Markdown documentation.
 
-The current repository state is a Python research/prototype project with Markdown research artifacts.
+No package manager, dependency file, app framework, lint command, test runner, Verify command, CI workflow, database, or deployment target is currently established.
+
+Use standard-library Python first unless a later feature justifies dependencies. Add pytest only through the explicit `$tests` workflow if the project needs a formal test gate.
+
+## Artifacts
 
 Established artifacts include:
 
 - `README.md` - project-facing explanation of the Transaction Agent problem and stage.
 - `research-file.md` - research notes, terms, architecture direction, prompts, AI error risks, baseline evaluation, and research direction.
 - `discussion-record.md` - human feedback and resulting design changes.
+- `experiments/transaction_agent_test_cases_v2.csv` - existing v2 / 35-case evaluation source.
 - `ai-genesis-kit/project-plan.md` - project plan.
-- `ai-genesis-kit/build-plan.md` - build-plan checklist.
-- `ai-genesis-kit/context/project-overview.md` - this durable AI-facing source of truth.
+- `ai-genesis-kit/build-plan.md` - numbered build-plan checklist.
+- `ai-genesis-kit/context/project-overview.md` - durable AI-facing source of truth generated from the planning docs.
 
-Current technical state:
+## Planned Work
 
-- Language: Python.
-- Project type: research/prototype.
-- Product implementation: not yet established beyond the prototype/research direction.
-- Test runner: not configured.
-- Package manager: not configured.
-- CI: not configured.
-- Database: not established.
-- Deployment target: not established.
+Completed build-plan items:
 
-Do not invent runtime behavior, package structure, app architecture, test results, or deployment details that are not present in the project.
+- Problem selection.
+- State and action framing.
+- Evidence direction.
+- Belief update direction.
+- Decision-cost direction.
+- Hold-state refinement.
+- Initial 15-case evaluation baseline.
+- V2 evaluation work.
+- Preservation of the original 15-case evaluation.
+- Location and preservation of the v2 / 35-case evaluation source at `experiments/transaction_agent_test_cases_v2.csv`.
 
-## Pending Work
+Pending MVP work:
 
-The next build-plan item is:
-
-- Locate and preserve v2 cases - identify where the existing v2 / 35 test cases live, document the source, and avoid overwriting them.
-
-Pending MVP work after that includes:
-
-- Add Python domain models for transactions, customer profiles, evidence signals, beliefs, action costs, decisions, verification responses, and pending/timeout outcomes.
-- Build profile summary logic from historical transactions.
-- Extract evidence by comparing incoming transactions with customer profiles.
+- Add Python data structures for transactions, customer profiles, evidence signals, beliefs, action costs, decisions, verification responses, and pending/timeout outcomes.
+- Derive normal customer behavior from historical transactions.
+- Compare incoming transactions with customer profiles and produce explicit evidence.
 - Update legitimate/fraudulent probabilities from priors and observed evidence.
-- Calculate expected cost for approve, hold, and stop.
-- Account for transaction context and cost differences so the agent does not rely on one fixed threshold for every transaction.
+- Calculate expected cost for approve, hold, and stop, then choose the lowest-cost action.
+- Account for transaction context and cost differences so the agent does not rely on one fixed threshold.
 - Model hold/question behavior, customer verification, no-response timeout, and a second belief update from new evidence.
-- Evaluate the decision process against the existing v2 / 35 test cases.
-- Compare v2 evaluation results to the original 15-case, 73.3% historical baseline.
+- Evaluate the decision process against `experiments/transaction_agent_test_cases_v2.csv` and compare results to the 15-case, 73.3% baseline.
 - Show evidence, prior belief, updated belief, expected costs, selected action, and follow-up belief updates in an inspectable report.
 
-## Established Constraints And Decisions
+Later or open work:
+
+- Decide whether priors, likelihoods, thresholds, and costs should live in code, config, or data.
+- Decide whether to use public fraud datasets such as IEEE-CIS or Fraud Detection Handbook simulated data after the prototype is stable.
+- Decide whether an LLM should extract evidence, explain decisions, simulate verification, or remain outside the core decision engine.
+- Decide whether the project should remain a script/prototype or become a CLI, notebook, API, or web UI.
+
+## Constraints
 
 - Preserve existing research work and evaluation history.
-- The original 15-case evaluation is historical baseline evidence and MUST NOT be recreated.
-- The existing v2/35-case work must be located, preserved, and used as the next evaluation source.
+- Preserve `experiments/transaction_agent_test_cases_v2.csv` as the existing v2 / 35-case evaluation source.
+- Do not recreate the original 15-case evaluation.
+- Do not overwrite, recreate, or replace the v2 CSV while building the evaluation runner.
 - Hidden states remain legitimate and fraudulent unless the project explicitly changes scope.
 - Actions remain approve, hold/question, and stop unless the project explicitly changes scope.
-- Hold/question is a first-class action for weak, missing, conflicting, or insufficient evidence.
+- Hold/question remains a first-class action for weak, missing, conflicting, or insufficient evidence.
 - The agent should use evidence, belief updates, decision thresholds, expected cost, and new evidence/verification loops.
 - Bayesian belief updating is the current belief-model direction.
 - Expected-cost decision making is the current decision-rule direction.
@@ -154,11 +152,9 @@ Pending MVP work after that includes:
 
 ## Open Questions
 
-- Where exactly is the existing v2/35-case source stored?
-- What is the exact format of the v2/35-case evaluation source and expected outputs?
-- Who, if anyone, is the intended evaluator beyond the project builder/reviewer?
+- Who is the intended evaluator beyond the project builder/reviewer?
 - Should the first runnable implementation be a script, CLI, notebook, API, or small web UI?
 - Should priors, likelihoods, thresholds, and costs be hand-authored assumptions, derived from research, learned from data, or loaded from config?
-- Which next evaluation target matters most: accuracy, false positives, false negatives, expected cost, consistency, explainability, or another metric?
+- Which evaluation target matters most next: accuracy, false positives, false negatives, expected cost, consistency, explainability, or another metric?
 - What should the timeout rule be when the customer does not respond?
 - What role, if any, should an LLM have beyond evidence explanation or extraction?
