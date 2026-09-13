@@ -290,20 +290,59 @@ Ask the customer to verify the transaction and use the response as additional ev
 
 ---
 
-## 12. Current Evaluation
+## 12. Historical Baseline (15 Cases)
 
-The prototype has been evaluated using **15 transaction test cases**.
+The initial early prototype was evaluated using **15 synthetic transaction test cases**:
 
 ```text
 Correct decisions: 11 / 15
 Accuracy: 73.3%
 ```
 
-This is the current baseline for evaluating the decision process and identifying where the agent makes incorrect decisions.
+This represents the historical baseline prior to the full end-to-end integration. It is preserved for reference and must not be confused with or replaced by the V2 benchmark.
 
 ---
 
-## 13. Research Direction
+## 13. V2 Benchmark Evaluation (35 Cases)
+
+The integrated Transaction Agent was evaluated against the frozen scenario dataset (`experiments/transaction_agent_test_cases_v2.csv`) using the automated runner (`src/evaluate_v2.py`).
+
+### 13.1 Methodology & Ground-Truth Blindness
+* **Ground-Truth Blindness**: The agent was strictly blind to `Hidden State` and `Expected Agent Action`. Evidence was extracted exclusively from non-ground-truth feature columns (`Amount (INR)`, `Merchant`, `Time`, `Location`, `Historical Behavior`, `Evidence Notes`).
+* **Decision Mechanism**: Prior belief ($P(\text{Fraud})=0.10, P(\text{Legit})=0.90$) was updated via the Bayesian engine for each extracted signal, followed by expected-cost minimization under `DEFAULT_COST_MODEL` (`Cost(Hold)=2.0`, `Cost(Approve|Fraud)=10.0`, `Cost(Stop|Legit)=8.0`).
+
+### 13.2 Overall Performance
+```text
+Evaluated Cases: 35
+Matched Expected Action: 22 / 35
+Agreement Rate: 62.9%
+```
+
+* **Action Distribution**:
+  - Expected: 12 APPROVE, 15 HOLD, 8 STOP
+  - Agent Selected: 21 APPROVE, 9 HOLD, 5 STOP
+* **Ground-Truth States**: 22 Legitimate, 13 Fraudulent
+
+### 13.3 Failure Analysis & Categorization (13 Mismatches)
+
+The mismatches reflect concrete mathematical and modeling properties rather than software bugs:
+
+1. **Category A: Prototype Assumption / Conditional Independence Dilution (7 cases: TC04, TC05, TC07, TC10, TC11, TC13, TC22)**
+   - *Dynamics*: Under conditional independence, multiplying three routine consistent signals (combined likelihood ratio $\approx 0.428$) dilutes a single moderate anomaly (`large_amount` ratio $1.5$). The resulting posterior ($P(\text{Fraud}) \approx 6.6\%$) remains well below the $20\%$ HOLD threshold, causing the agent to choose APPROVE where human benchmark expected HOLD.
+   - *Decision Boundary*: In TC07, $P(\text{Fraud}) = 19.94\%$, missing the $20.0\%$ boundary by just $0.06$ percentage points.
+
+2. **Category B: Decision Boundary / Evaluation-Set Behavior (2 cases: TC08, TC14)**
+   - *Dynamics*: The benchmark expected STOP, but the agent chose HOLD.
+   - *Rationale*: In both cases, 3 anomalies and 1 consistent signal yielded $P(\text{Fraud}) \approx 40\%–51\%$. Under expected-cost decision theory, STOP requires $P(\text{Fraud}) > 75\%$. At $40\%–50\%$, paying $2.0$ to HOLD for customer verification has lower expected cost ($EC=2.0$) than an irreversible STOP ($EC \approx 3.9–4.8$). In risk-sensitive payment processing, pausing an ambiguous payment is rational.
+
+3. **Category C: Open Modeling Questions / Currently Missing Signals (4 cases: TC20, TC25, TC26, TC35)**
+   - `TC20` (Velocity): 3 transactions within 6 minutes at unfamiliar merchants. The prototype lacks temporal burst/velocity tracking.
+   - `TC25`, `TC26` (Merchant Category): Unfamiliar merchant within a familiar spending category. The merchant checker is currently strictly binary.
+   - `TC35` (Sparse Profile): Profile has fewer than 5 past transactions. Profile uncertainty / maturity is not yet modeled.
+
+---
+
+## 14. Research Direction
 
 The final architecture treats transaction processing as a **sequential decision problem under uncertainty**.
 
@@ -320,11 +359,14 @@ Expected Cost
     ↓
 Decision
     ↓
-More Evidence if Required
+More Evidence if Required (Hold → Verification)
     ↓
 Belief Update
+    ↓
+Final Decision
 ```
 
 The central research question is:
 
 > Can a transaction agent make more consistent decisions by maintaining an explicit belief about the hidden state, updating that belief with new evidence, and selecting actions according to expected cost?
+

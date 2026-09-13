@@ -68,6 +68,16 @@ class CustomerProfile:
     customer_id: str
     historical_transactions: list[HistoricalTransaction]
 
+@dataclass
+class ProfileSummary:
+    """Derived summary of a customer's normal historical behavior."""
+
+    customer_id: str
+    typical_amount: float | None
+    common_merchants: list[str]
+    typical_locations: list[str]
+    typical_transaction_hours: list[int]
+
 
 @dataclass
 class Evidence:
@@ -130,6 +140,7 @@ __all__: list[str] = [
     "HiddenState",
     "HistoricalTransaction",
     "PendingVerification",
+    "ProfileSummary",
     "Transaction",
     "Verification",
     "VerificationResponse",
