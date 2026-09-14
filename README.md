@@ -163,19 +163,3 @@ This historical baseline is preserved for reference and is distinct from the 35-
 
 ---
 
-## 7. Project Scope & Week 2 Starting Point
-
-### Intentionally Deferred (NOT part of Week 1)
-- Machine Learning (ML) classifiers
-- Large Language Model (LLM) decision calls
-- Temporal transaction velocity modeling
-- Merchant category hierarchies
-- Customer profile maturity scoring
-- Web UI / frontend dashboards
-- Production deployment or APIs
-
-### Week 2 Starting Point
-Week 2 begins with a tested, integrated decision agent and an empirical evaluation benchmark. The immediate research priorities are:
-1. Investigating non-linear evidence combination to prevent dilution of single extreme anomalies.
-2. Exploring transaction velocity and profile maturity as formal evidence signals.
-3. Analyzing cost matrix calibration for boundary cases.
