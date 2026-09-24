@@ -1,0 +1,589 @@
+%%%% transaction-agent-ijcai26-preprint.tex
+%%%% IJCAI--ECAI 26 preprint for the Transaction-Agent research prototype.
+
+\typeout{IJCAI--ECAI 26 Instructions for Authors}
+
+\documentclass{article}
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
+
+% The file ijcai26.sty is a copy from ijcai22.sty
+% The file ijcai22.sty is NOT the same as previous years'
+\usepackage{ijcai26}
+
+% Use the postscript times font!
+\usepackage{times}
+\usepackage{soul}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[small]{caption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+% Line numbers: the lineno package interferes with two-column float placement
+% (tables/algorithm get overprinted by body text), so it is not loaded here.
+% Re-enable with "\usepackage[switch]{lineno}" + "\linenumbers" ONLY if a
+% blind submission system explicitly requires it, then re-verify the layout.
+%\usepackage[switch]{lineno}
+
+% Line numbers: enable only for anonymous submission. Keep disabled for the
+% public preprint.
+%\linenumbers
+
+\urlstyle{same}
+
+% the following package is optional:
+%\usepackage{latexsym}
+
+% See https://www.overleaf.com/learn/latex/theorems_and_proofs
+% for a nice explanation of how to define new theorems, but keep
+% in mind that the amsthm package is already included in this
+% template and that you must *not* alter the styling.
+\newtheorem{example}{Example}
+\newtheorem{theorem}{Theorem}
+
+% PDF Info Is REQUIRED.
+
+% Please leave this \pdfinfo block untouched both for the submission and
+% Camera Ready Copy. Do not include Title and Author information in the pdfinfo section
+\pdfinfo{
+/TemplateVersion (IJCAI.2026.0)
+}
+
+\title{Belief-Based Sequential Decision Making for Financial Transaction Fraud Detection}
+
+\author{
+    Rahul Krishna K$^1$\\
+    \affiliations
+    $^1$Independent Researcher\\
+    \emails
+    rahulkrishnak448@gmail.com
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Financial transaction fraud detection is a sequential decision problem under
+uncertainty: the true state of a transaction is hidden, the cost of a wrong
+decision is asymmetric, and a cautious agent may defer an irreversible action
+by pausing the transaction and collecting additional evidence. We present a
+research prototype of a transaction-decision agent that (i)~summarizes a
+customer's historical behavior into a lightweight profile, (ii)~extracts
+rule-based evidence signals by comparing an incoming transaction to that
+profile, (iii)~maintains an explicit Bayesian belief over the hidden
+legitimate/fraudulent state, and (iv)~selects among \textsc{Approve},
+\textsc{Hold}, and \textsc{Stop} by minimizing expected cost, where
+\textsc{Hold} triggers a customer-verification feedback loop that updates the
+belief before a final decision. We evaluate the agent on a frozen,
+ground-truth-blind benchmark of 35 adversarially constructed cases. The agent
+matches the expected decision on 22/35 cases (62.9\%). We decompose all 13
+mismatches into three categories: evidence dilution under conditional
+independence, decision-boundary calibration, and signals not yet modeled
+(transaction velocity, merchant-category familiarity, profile maturity). Using
+twin-case pairs, we empirically demonstrate that the agent's decisions do not
+leak ground-truth labels. The system is implemented in pure Python (standard
+library only; 23 passing unit and integration tests).
+\end{abstract}
+
+\section{Introduction}
+
+Fraud detection for financial transactions is dominated by machine-learning
+classifiers that map a transaction to a fraud score and then threshold the
+score~\cite{bolton2002,bhattacharyya2011,leborgen2021}. Two properties of the
+problem are frequently underspecified in this paradigm. First, the cost of a
+mis-decision is strongly asymmetric and context-dependent: approving a
+fraudulent high-value transfer is far more costly than delaying a legitimate
+low-value purchase, and the two errors have different business
+consequences~\cite{bahnsen2013}. Second, fraud detection is inherently a
+\emph{sequential} decision problem: the transaction arrives with incomplete
+information, and the agent may avoid an irreversible decision by pausing the
+transaction and soliciting verification evidence from the customer.
+
+This paper describes a research prototype --- the \emph{Transaction Agent} ---
+that treats the problem as one of decision-making under uncertainty rather
+than of classification. The agent (i)~builds a per-customer behavioral profile
+from historical transactions, (ii)~extracts interpretable evidence signals by
+comparing the incoming transaction with the profile, (iii)~updates an explicit
+Bayesian belief over the hidden state using a small, fully transparent
+likelihood table, and (iv)~chooses among \textsc{Approve}, \textsc{Hold}, and
+\textsc{Stop} by minimizing expected cost. \textsc{Hold} is a first-class
+information-gathering action: it pauses the transaction, requests customer
+verification, and feeds the response back into the belief engine before a
+final decision.
+
+The prototype avoids all learned components: there are no classifiers, no
+gradient updates, and no pretrained models. Every decision can be traced to a
+handful of explicitly stated probabilities and costs, which makes the system
+amenable to audit and to scientific study of its failure modes. We evaluate it
+on a frozen benchmark of 35 adversarially constructed scenarios in which the
+agent is kept strictly blind to ground truth. Our contributions are:
+
+\begin{itemize}
+  \item A complete, standard-library-only implementation of a sequential
+  Bayesian decision agent for transaction fraud, with \textsc{Hold} as a
+  first-class evidence-gathering action, validated by 23 automated tests.
+  \item A ground-truth-blind evaluation protocol on a frozen 35-case benchmark,
+  including \emph{twin-case} pairs with identical evidence but opposite hidden
+  states, used to empirically verify the absence of label leakage.
+  \item A quantitative failure taxonomy of the 13 benchmark mismatches,
+  isolating three concrete modeling gaps: conditional-independence dilution,
+  decision-boundary calibration, and missing signal channels (velocity,
+  merchant-category familiarity, profile maturity).
+\end{itemize}
+
+\section{Related Work}
+
+\emph{Statistical fraud detection.} Bolton and Hand~\cite{bolton2002} survey
+statistical methods for fraud detection and emphasize that fraud detection is
+a decision problem in which the cost structure of errors matters more than raw
+accuracy. Hand and Henley~\cite{hand1997} reach a similar conclusion for
+consumer credit scoring, treating scorecard thresholds as decision points that
+should reflect the economics of lending. Our work follows this decision-theoretic
+tradition rather than the accuracy-centric view of modern classifier benchmarks.
+
+\emph{Cost-sensitive learning.} Bahnsen et al.~\cite{bahnsen2013} provide the
+closest methodological ancestor: they formulate credit-card fraud detection as
+a Bayes minimum-risk problem in which classification is performed by
+minimizing the expected misclassification cost instead of the error rate. We
+adopt the same principle but replace their expensive per-model cost matrix
+estimation with an explicit, interpretable cost model and extend the single
+decision into a \emph{sequential} loop in which one action
+(\textsc{Hold}) yields additional evidence.
+
+\emph{Modern fraud-detection benchmarks.} Large public data efforts such as the
+IEEE-CIS Kaggle competition~\cite{iececis2019} and the reproducible
+Fraud-Detection Handbook~\cite{leborgen2021} provide transactional data and
+accurate/recalibrated classifier baselines. These datasets are valuable for
+future validation of the agent's belief engine, but their evaluation protocol
+is classification-oriented; they do not model deferred decisions or
+information acquisition, which are central to our setting.
+
+\emph{Uncertainty in agents.} The emerging literature on uncertainty
+quantification in interactive LLM agents studies how an agent's estimate of
+its own uncertainty changes as it interacts and gathers information. Our
+verification loop is a concrete, non-learned instance of this principle: the
+agent tracks a calibrated probability and chooses to gather more evidence only
+when its belief falls in an ambiguous region. This connects the classical
+decision-theoretic machinery with the emerging ``act-to-resolve-uncertainty''
+view of agents.
+
+\section{Problem Statement}
+
+A transaction $T$ arrives with observable features: amount $A$, merchant $M$,
+timestamp $\tau$, and location $L$. The \emph{hidden state} $H \in
+\{\textsc{Legit}, \textsc{Fraud}\}$ is unobserved. The agent also has access to
+the customer's historical transactions, from which a profile is derived. The
+agent must select one of three actions:
+
+\begin{itemize}
+  \item \textsc{Approve}: release the transaction immediately;
+  \item \textsc{Hold}: pause the transaction and request customer verification;
+  \item \textsc{Stop}: terminate the transaction immediately.
+\end{itemize}
+
+Each action has a known cost $C(a \mid H)$ for each hidden state. The agent's
+goal is to minimize the expected cost given its current belief. This is a
+two-stage sequential decision: if \textsc{Hold} is chosen, a verification
+response $V$ arrives and the belief is updated before the agent commits to a
+terminal action. Because \textsc{Approve} and \textsc{Stop} are irreversible,
+the problem is a degenerate (two-stage) partially observable Markov decision
+process, in which the single ``act'' that changes the information state is the
+verification solicitation.
+
+\section{The Transaction Agent}
+
+The agent's pipeline is summarized in Algorithm~\ref{alg:pipeline}. Its modules
+are cleanly separated: profiling, evidence extraction, belief updating,
+decision making, and verification. All parameters are explicit and modular;
+each decision can be reproduced by hand from the tables in this paper.
+
+\subsection{Behavioral Profiling}
+
+Historical transactions for a customer $c$ are summarized into a profile
+$S_c$:
+\begin{itemize}
+  \item \emph{Typical amount}: the median of all non-missing historical
+  amounts;
+  \item \emph{Common merchants}, \emph{typical locations}, and \emph{typical
+  hours}: the sets of merchants, cities, and hour-of-day values appearing in
+  the customer's history, in order of first appearance.
+\end{itemize}
+
+Missing values in the historical records are handled gracefully: a customer
+with no usable amounts simply has no typical amount. In our experiments the
+history consists of 200 synthetic records across 10 customers (C001--C010).
+
+\subsection{Evidence Extraction}
+
+Four rule-based checkers compare the incoming transaction with $S_c$ and emit
+one evidence signal each:
+
+\begin{itemize}
+  \item \emph{Amount}: if $A > 1.5 \times \text{median}$, emit
+  \texttt{large\_amount} (fraud-supporting); otherwise
+  \texttt{amount\_consistent}.
+  \item \emph{Merchant}: if $M \notin$ common merchants, emit
+  \texttt{new\_merchant}; otherwise \texttt{merchant\_consistent}.
+  \item \emph{Location}: if $L \notin$ typical locations, emit
+  \texttt{unusual\_location}; otherwise \texttt{location\_consistent}.
+  \item \emph{Time}: if $\tau.\text{hour} \notin$ typical hours, emit
+  \texttt{unusual\_time}; otherwise \texttt{time\_consistent}.
+\end{itemize}
+
+Any missing feature emits a neutral \texttt{*\_unknown} signal that leaves the
+belief unchanged. This keeps the system robust to incomplete transaction data.
+
+\subsection{Bayesian Belief Updating}
+
+The agent maintains a belief $(p_L, p_F)$ over the hidden state, initialized
+with the prior
+\begin{equation}
+  p_L^{(0)} = 0.90, \qquad p_F^{(0)} = 0.10 .
+\end{equation}
+Each evidence signal $E$ updates the belief by Bayes' rule:
+\begin{equation}
+  p_F \leftarrow
+  \frac{p_F \, P(E \mid \textsc{Fraud})}
+  {p_F \, P(E \mid \textsc{Fraud}) + p_L \, P(E \mid \textsc{Legit})} .
+\label{eq:bayes}
+\end{equation}
+Under the conditional-independence assumption, evidence arriving sequentially
+is applied multiplicatively. In odds form the update is compact:
+\begin{equation}
+  O(F \mid E_1 \dots E_n) \;=\; O^{(0)}(F) \prod_{i=1}^{n} \Lambda(E_i),
+\label{eq:odds}
+\end{equation}
+where each signal contributes a likelihood ratio
+\begin{equation}
+  \Lambda(E_i) = \frac{P(E_i \mid \textsc{Fraud})}
+  {P(E_i \mid \textsc{Legit})},
+\label{eq:lambda}
+\end{equation}
+and $O(F) = p_F / p_L$. Table~\ref{tab:likelihoods} lists the prototype
+likelihood table, which is fully explicit and auditable. Consistency signals
+carry likelihood ratios below 1 (they push the belief toward legitimate),
+anomaly signals carry ratios above 1, and the two verification signals are the
+strongest evidence available: a customer denial has ratio $19$, a confirmation
+ratio $0.053$.
+
+\subsection{Expected-Cost Decision Making}
+
+The expected cost of action $a$ under belief $(p_L, p_F)$ is
+\begin{equation}
+  \mathbb{E}[C \mid a] = p_L \, C(a \mid \textsc{Legit})
+  + p_F \, C(a \mid \textsc{Fraud}).
+\label{eq:ec}
+\end{equation}
+The default cost model (Table~\ref{tab:costs}) sets approving a fraudulent
+transaction at cost $10$, stopping a legitimate one at cost $8$, and treating
+verification (\textsc{Hold}) as cheap and symmetric ($2$), reflecting low
+customer friction for an out-of-band confirmation.
+
+\begin{theorem}[Decision regions]
+\label{thm:decision-regions}
+Under the cost model of Table~\ref{tab:costs}, the expected-cost-minimizing
+action is a function of $p_F$ alone:
+\begin{equation}
+  a^*(p_F) = \begin{cases}
+    \textsc{Approve} & p_F < 0.2,\\
+    \textsc{Hold}    & 0.2 \le p_F \le 0.75,\\
+    \textsc{Stop}    & p_F > 0.75 .
+  \end{cases}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+From Eq.~\eqref{eq:ec}: $\mathbb{E}[C \mid \textsc{Approve}] = 10 p_F$,
+$\mathbb{E}[C \mid \textsc{Hold}] = 2$,
+$\mathbb{E}[C \mid \textsc{Stop}] = 8(1 - p_F)$.
+Comparing the first two, \textsc{Approve} is optimal iff $10 p_F < 2$,
+i.e.\ $p_F < 0.2$. Comparing the last two, \textsc{Hold} beats \textsc{Stop}
+iff $2 < 8(1 - p_F)$, i.e.\ $p_F < 0.75$.
+\end{proof}
+
+\begin{algorithm}[tb]
+\caption{Transaction decision loop}
+\label{alg:pipeline}
+\textbf{Input}: Customer history $\mathcal{H}_c$, incoming transaction $T$\\
+\textbf{Parameter}: Prior $(0.90, 0.10)$; LRs (Tab.~\ref{tab:likelihoods}); costs (Tab.~\ref{tab:costs})\\
+\textbf{Output}: Final action $a^* \in \{\textsc{Approve}, \textsc{Stop}\}$
+\begin{algorithmic}[1]
+\STATE Build profile $S_c$ from $\mathcal{H}_c$ (median amount, merchants, hours).
+\STATE Extract evidence $\{E_1,\dots,E_4\}$ by comparing $T$ with $S_c$.
+\STATE Initialize belief $b \leftarrow (0.90, 0.10)$.
+\FOR{each $E_i$}
+  \STATE Update $b$ with Bayes' rule (Eq.~\eqref{eq:bayes}).
+\ENDFOR
+\STATE Compute $\mathbb{E}[C \mid a]$ for all $a$ (Eq.~\eqref{eq:ec}).
+\IF{$\arg\min_a \mathbb{E}[C\mid a] = \textsc{Hold}$}
+  \STATE Request customer verification; obtain response $V$.
+  \STATE Convert $V$ to verification evidence (\texttt{customer\_confirms} /
+  \texttt{customer\_denies}).
+  \STATE Update $b$ again; recompute expected costs.
+  \STATE Return the new argmin (over \textsc{Approve} / \textsc{Stop}).
+\ELSE
+  \STATE Return the argmin action directly.
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+Evidence signal & $P(E\mid\textsc{Frg})$ & $P(E\mid\textsc{Lgt})$ & $\Lambda$ \\
+\midrule
+\texttt{large\_amount}      & 0.30 & 0.20 & 1.50 \\
+\texttt{amount\_consistent} & 0.70 & 0.80 & 0.875 \\
+\texttt{new\_merchant}      & 0.30 & 0.15 & 2.00 \\
+\texttt{merchant\_consistent}& 0.70 & 0.85 & 0.824 \\
+\texttt{unusual\_location}  & 0.30 & 0.10 & 3.00 \\
+\texttt{location\_consistent}& 0.70 & 0.90 & 0.778 \\
+\texttt{unusual\_time}      & 0.40 & 0.10 & 4.00 \\
+\texttt{time\_consistent}   & 0.60 & 0.90 & 0.667 \\
+\texttt{customer\_confirms} & 0.05 & 0.95 & 0.053 \\
+\texttt{customer\_denies}   & 0.95 & 0.05 & 19.00 \\
+\bottomrule
+\end{tabular}
+\caption{Prototype likelihood table with ratios $\Lambda =
+P(E\mid\textsc{Fraud})/P(E\mid\textsc{Legit})$. Consistency signals are
+complements of anomaly signals; ``unknown'' signals are neutral and omitted.}
+\label{tab:likelihoods}
+\end{table}
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+Hidden state & \textsc{Approve} & \textsc{Hold} & \textsc{Stop} \\
+\midrule
+\textsc{Legit}  & 0.0 & 2.0 & 8.0 \\
+\textsc{Fraud}  & 10.0 & 2.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+\caption{Default cost model. Asymmetric costs make the optimal action a pure
+function of $p_F$ (Theorem~\ref{thm:decision-regions}).}
+\label{tab:costs}
+\end{table}
+
+A subtle discovery from the prototype's development is worth reporting here:
+the agent's \emph{first} cost model set $\textsc{Hold}$ at
+$(\text{legit}=6,\ \text{fraud}=4)$, which makes \textsc{Hold} dominated --- its
+expected cost exceeds both \textsc{Approve} and \textsc{Stop} at every belief
+point in $[0,1]$. \textsc{Hold} was mathematically inadmissible, a fact that
+was invisible in an accuracy-framed classifier but immediately surfaced in the
+expected-cost formulation. The default model of Table~\ref{tab:costs} was
+adopted specifically so that the three decision regions of
+Theorem~\ref{thm:decision-regions} are non-degenerate.
+
+\subsection{Verification as Information Gathering}
+
+If the initial decision is \textsc{Hold}, the agent creates a pending
+verification request, records the customer's response, converts it into
+verification evidence (\texttt{customer\_confirms} or \texttt{customer\_denies}),
+updates the belief once more, and re-runs expected-cost minimization over the
+two terminal actions. Because a denial carries likelihood ratio 19, a single
+failed verification can push a $p_F$ in the ambiguous $[0.2, 0.75]$ band above
+the 75\% \textsc{Stop} threshold; a confirmation pushes it far below 20\%.
+This realizes, in explicit probabilistic form, the principle that a
+\emph{reversible} action at a 50/50 belief is often the cheapest choice.
+
+\section{Evaluation}
+
+\subsection{Benchmark Design and Ground-Truth Blindness}
+
+The benchmark file used throughout this evaluation%
+\footnote{\texttt{transaction\_agent\_test\_cases\_v2.csv} in \texttt{experiments/}.} is
+\emph{frozen} and read-only:
+it contains 35 scenario
+cases (TC01--TC35) and must not be regenerated. Each case specifies the
+observed features
+(amount, merchant, time, location), a natural-language description of the
+customer's historical behavior, explicit evidence notes, and --- hidden from
+the agent --- the ground-truth state ($22$ legitimate, $13$ fraudulent) and the
+human-expected action ($12$ \textsc{Approve}, $15$ \textsc{Hold},
+$8$ \textsc{Stop}).
+
+The evaluation runner computes the agent's decision from feature columns only.
+Ground truth is read solely for post-hoc comparison, after the decision is
+finalized. The set deliberately contains five \emph{twin pairs} --- cases with
+identical evidence but opposite hidden states (e.g., TC04/TC05, TC10/TC11) ---
+so that any leakage of ground truth into the decision would be directly
+observable as a disagreement between twins.
+
+\subsection{Results}
+
+The agent selected \textsc{Approve} 21 times, \textsc{Hold} 9 times, and
+\textsc{Stop} 5 times, matching the expected action on 22/35 cases
+($62.9\%$). Table~\ref{tab:results} shows representative cases. Consistent
+transactions (TC01, TC19) are approved with posterior fraud probability near
+$4\%$; fully anomalous transactions (TC02, TC23, TC33) are stopped with
+$p_F = 80\%$; and genuinely ambiguous two-anomaly cases (TC17, TC18) land in
+the \textsc{Hold} band, exactly where the cost model intends.
+
+\begin{table}[tb]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{llrcl}
+\toprule
+Case & Evidence summary & $p_F$ & Agt./Exp. & Match\\
+\midrule
+TC01 & 4 consistent & 0.040 & A/A & \checkmark\\
+TC02 & 4 anomalies & 0.800 & S/S & \checkmark\\
+TC04 & large amt + 3 ok & 0.066 & A/H & $\times$\\
+TC07 & unusual time + 3 ok & 0.199 & A/H & $\times$\\
+TC08 & 3 anom. + 1 ok & 0.509 & H/S & $\times$\\
+TC17 & 2 anom. (time+loc) & 0.490 & H/H & \checkmark\\
+TC20 & 3 txs in 6~min & 0.092 & A/S & $\times$\\
+TC25 & unfamiliar merc. (cat.) & 0.092 & A/H & $\times$\\
+TC33 & extreme amt + 4 anom. & 0.800 & S/S & \checkmark\\
+TC35 & sparse profile ($<$5 txs) & 0.092 & A/H & $\times$\\
+\bottomrule
+\end{tabular}
+\caption{Representative benchmark cases. $p_F$ is the posterior fraud
+probability after belief updating; A/H/S denote
+\textsc{Approve}/\textsc{Hold}/\textsc{Stop}; Match compares the agent's
+decision with the human-expected action.}
+\label{tab:results}
+\end{table}
+
+\subsection{Failure Taxonomy}
+
+All 13 mismatches fall into three categories, each with a distinct mechanism:
+
+\paragraph{Category A: Conditional-independence dilution (7 cases).}
+TC04, TC05, TC10, TC11, TC13, TC22, TC07. A single moderate anomaly (e.g.\ a
+large amount) combined with three routine consistent signals is diluted by the
+multiplicative independence update. In TC04/TC05 the product of likelihood
+ratios is $1.5 \times 0.824 \times 0.778 \times 0.667 = 0.642$, driving $p_F$
+\emph{down} from 10\% to 6.6\% below the 20\% \textsc{Hold} threshold, even
+though the amount is $4\times$ the historical maximum. TC07 reaches
+$p_F = 19.94\%$, missing the boundary by 0.06 points. This is a modeling
+limitation, not a software bug: naive conditional independence lets many
+``routine'' signals cancel an extreme outlier.
+
+\paragraph{Category B: Decision-boundary behavior (2 cases).}
+TC08, TC14. The benchmark expected \textsc{Stop}; the agent chose
+\textsc{Hold} with $p_F \in [0.40, 0.51]$. Because \textsc{Stop} costs $8$
+against a legitimate transaction, its expected cost is $8(1-p_F) \ge 3.93$,
+which exceeds the constant cost $2$ of \textsc{Hold}. Under the stated cost
+model, pausing a 50/50 transaction for verification is strictly cheaper than
+an irreversible cancellation --- the agent's choice is the rational one under
+Theorem~\ref{thm:decision-regions}. The disagreement reveals a normative difference in
+how aggressively fraud should be terminated, i.e.\ a cost-calibration question,
+not a reasoning error.
+
+\paragraph{Category C: Missing signal channels (4 cases).}
+TC20 (three transactions within six minutes --- transaction \emph{velocity} is
+not represented in the four single-transaction checkers), TC25/TC26 (an
+unfamiliar merchant within a familiar spending category --- merchant familiarity
+is currently binary), and TC35 (a profile with fewer than five prior
+transactions --- profile \emph{maturity} is not modeled). Each of these is a
+deliberately deferred feature whose signal channel does not yet exist.
+
+\subsection{Twin-Pair Probe for Label Leakage}
+
+For every twin pair (TC04/TC05, TC10/TC11, TC17/TC18, TC25/TC26, TC31/TC32),
+the agent produced the identical decision for both members, despite opposite
+ground-truth states. Since the two members share evidence and differ only in
+the hidden label, identical outputs are consistent with the agent operating
+purely on features. This serves as an empirical control that the ground-truth
+columns do not influence the decision.
+
+\section{Discussion}
+
+The prototype's value is primarily investigative. Three conclusions emerge.
+First, an explicit belief state makes otherwise subtle modeling assumptions
+visible. The conditional-independence assumption is attractive for its
+simplicity and its closed-form updates (Eq.~\eqref{eq:odds}), but the benchmark
+shows it over-weights repeated routine evidence against a single extreme
+anomaly. Second, expected-cost decision making surfaces normative tension that
+accuracy metrics hide: the TC08/TC14 disagreements are not errors but a
+stance on the economics of false stops, and the history of the cost model shows
+how easily a classifier designer can make a reasonable action
+(\textsc{Hold}) structurally unused. Third, the twin pairs and the frozen
+benchmark provide a reusable evaluation protocol for future signal channels.
+
+The system has deliberate limitations. All probabilities, likelihoods, and
+costs are synthetic research assumptions, not calibrated banking statistics;
+parameters must be estimated from real data before deployment. The evidence
+set is small (four channels) and single-transaction; and the verification loop
+assumes a reliable response channel. Deployment concerns (timing, fraud rings,
+identity-verification cost) are out of scope for this prototype.
+
+\section{Future Work}
+
+The benchmark failures define the research agenda directly. (i)~\emph{Non-linear
+evidence combination}: extreme individual anomalies should resist dilution,
+e.g.\ by capping the strength of routine signals or introducing a generalized
+aggregation rule; TC07's 0.06-point miss indicates that even the boundary
+behavior is fragile. (ii)~\emph{New signal channels}: transaction velocity,
+merchant-category familiarity, and profile-maturity estimates should become
+first-class evidence channels with their own likelihood entries. (iii)~\emph{Cost
+calibration}: the HOLD/STOP boundary should be studied against real
+false-positive and false-negative economics, and the cost model should be
+parameterized per transaction context (e.g., low versus high denomination).
+(iv)~\emph{Empirical validation}: the agent's belief engine and likelihood
+table should be confronted with real transaction data such as the IEEE-CIS
+dataset~\cite{iececis2019} after estimating parameters from observed
+frequencies. We also plan to study the connection between the verification
+loop and uncertainty-driven information acquisition in agents.
+
+\section*{Ethical Statement}
+
+This paper reports a research prototype evaluated only on synthetic data.
+No real customer data was used, and no deployment or financial decisions were
+influenced by the system. The benchmark cases are fabricated and carry no
+personally identifiable information.
+
+\bibliographystyle{named}
+\begin{thebibliography}{9}
+
+\bibitem{bolton2002}
+R.~J. Bolton and D.~J. Hand.
+Statistical fraud detection: A review.
+\emph{Statistical Science}, 17(3):235--255, 2002.
+
+\bibitem{hand1997}
+D.~J. Hand and W.~E. Henley.
+Statistical classification methods in consumer credit scoring: A review.
+\emph{Journal of the Royal Statistical Society: Series A}, 160(3):523--541, 1997.
+
+\bibitem{bahnsen2013}
+A.~C. Bahnsen, D.~Aouada, A.~Stojanovic, and B.~Ottersten.
+Cost sensitive credit card fraud detection using Bayes minimum risk.
+In \emph{Proc.~12th International Conference on Machine Learning and
+Applications (ICMLA)}, volume~1, pages 333--338. IEEE, 2013.
+
+\bibitem{bhattacharyya2011}
+S.~Bhattacharyya, S.~Jha, K.~Tharakunnel, and J.~C. Westland.
+Data mining for credit card fraud: A comparative study.
+\emph{Decision Support Systems}, 50(3):602--613, 2011.
+
+\bibitem{leborgen2021}
+Y.-A.~Le~Borgne, W.~Siblini, B.~Lebichot, and G.~Bontempi.
+Reproducible Machine Learning for Credit Card Fraud Detection ---
+Practical Handbook.
+Open-source handbook, 2021. \url{https://github.com/Fraud-Detection-Handbook}.
+
+\bibitem{iececis2019}
+IEEE-CIS.
+IEEE-CIS Fraud Detection.
+Kaggle competition data set, 2019.
+\url{https://www.kaggle.com/c/ieee-fraud-detection}.
+
+\end{thebibliography}
+
+\end{document}
