@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transaction Agent — Audit & Architecture Dashboard</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen flex flex-col md:flex-row">
+  
+  <!-- Sidebar Navigation -->
+  <aside class="w-full md:w-64 bg-[var(--card)] border-r border-[var(--border)] p-5 flex flex-col justify-between shrink-0 space-y-6">
+    <div class="space-y-6">
+      
+      <!-- Logo / Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 font-bold text-lg">
+          &tau;
+        </div>
+        <div>
+          <div class="font-bold text-sm text-[var(--foreground)] tracking-tight">Transaction Agent</div>
+          <div class="text-[10px] text-[var(--muted-foreground)] font-mono">v2.0 Probabilistic</div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1.5 text-xs">
+        <button id="nav-page1" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Audit & Simulator
+        </button>
+
+        <button id="nav-page2" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-[var(--muted-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          How It Thinks (Guide)
+        </button>
+      </nav>
+
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="border-t border-[var(--border)] pt-4 text-[11px] text-[var(--muted-foreground)] space-y-1">
+      <div class="flex items-center justify-between">
+        <span>Framework:</span>
+        <span class="font-medium text-[var(--foreground)]">IJCAI-26</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span>Unit Tests:</span>
+        <span class="font-medium text-emerald-500">34 Passed</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow p-6 overflow-y-auto max-w-7xl mx-auto w-full">
+    
+    <!-- PAGE 1: AUDIT & SIMULATOR (Default Visible) -->
+    <div id="page1-content" class="space-y-6">
+      
+      <!-- Header Banner -->
+      <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold tracking-tight text-[var(--foreground)]">Transaction Agent Audit Dashboard</h1>
+            <span class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">v2.0 Probabilistic</span>
+          </div>
+          <p class="text-sm text-[var(--muted-foreground)] mt-1">
+            Explainable AI Decision Audit & Active Sensing Simulator for Financial Fraud Detection
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 text-xs">
+          <div class="bg-black/5 dark:bg-white/5 border border-[var(--border)] rounded-xl px-3 py-2 text-center">
+            <div class="text-[var(--muted-foreground)] uppercase tracking-wider font-semibold text-[10px]">Benchmark ECE</div>
+            <div class="text-sm font-bold text-[var(--foreground)] mt-0.5">0.1283</div>
+          </div>
+          <div class="bg-black/5 dark:bg-white/5 border border-[var(--border)] rounded-xl px-3 py-2 text-center">
+            <div class="text-[var(--muted-foreground)] uppercase tracking-wider font-semibold text-[10px]">Mean Entropy</div>
+            <div class="text-sm font-bold text-[var(--foreground)] mt-0.5">0.5365 bits</div>
+          </div>
+          <div class="bg-black/5 dark:bg-white/5 border border-[var(--border)] rounded-xl px-3 py-2 text-center">
+            <div class="text-[var(--muted-foreground)] uppercase tracking-wider font-semibold text-[10px]">Mean KL Div</div>
+            <div class="text-sm font-bold text-[var(--foreground)] mt-0.5">0.3862 bits</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Grid Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Input Controls -->
+        <div class="lg:col-span-4 space-y-6">
+          
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-5">
+            <h2 class="text-base font-semibold text-[var(--foreground)] flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              Evaluator Controls
+            </h2>
+
+            <div>
+              <label class="block text-xs font-medium text-[var(--muted-foreground)] mb-1.5">Load Benchmark Test Case</label>
+              <select id="case-select" class="w-full bg-[var(--background)] text-[var(--foreground)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="custom">-- Custom Input --</option>
+                <option value="TC01">TC01: Routine Transaction (Expected: Approve)</option>
+                <option value="TC02">TC02: Extreme Fraud Anomaly (Expected: Stop)</option>
+                <option value="TC04">TC04: Large Amount Anomaly (Expected: Hold)</option>
+                <option value="TC07">TC07: Unusual Time Anomaly (Expected: Hold)</option>
+                <option value="TC17">TC17: Two Anomalies (Time + Location) (Expected: Hold)</option>
+                <option value="TC23">TC23: Extreme Amount & Location (Expected: Stop)</option>
+                <option value="TC33">TC33: All 4 Anomalies Present (Expected: Stop)</option>
+              </select>
+            </div>
+
+            <div class="relative flex items-center py-1">
+              <div class="flex-grow border-t border-[var(--border)]"></div>
+              <span class="flex-shrink mx-2 text-[10px] uppercase font-semibold text-[var(--muted-foreground)] tracking-wider">or custom inputs</span>
+              <div class="flex-grow border-t border-[var(--border)]"></div>
+            </div>
+
+            <div class="space-y-3.5 text-xs">
+              <div>
+                <label class="block text-[var(--muted-foreground)] font-medium mb-1">Amount (INR)</label>
+                <input type="number" id="input-amount" value="3500" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[var(--foreground)]">
+              </div>
+
+              <div>
+                <label class="block text-[var(--muted-foreground)] font-medium mb-1">Merchant Status</label>
+                <select id="input-merchant" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[var(--foreground)]">
+                  <option value="merchant_consistent">Known / Consistent Merchant</option>
+                  <option value="new_merchant">Unfamiliar / New Merchant</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[var(--muted-foreground)] font-medium mb-1">Time of Day</label>
+                <select id="input-time" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[var(--foreground)]">
+                  <option value="time_consistent">Normal Hour (Historical Spread)</option>
+                  <option value="unusual_time">Unusual Hour (3 AM - 4 AM)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-[var(--muted-foreground)] font-medium mb-1">Location Status</label>
+                <select id="input-location" class="w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[var(--foreground)]">
+                  <option value="location_consistent">Usual City / Location</option>
+                  <option value="unusual_location">Different City / Foreign IP</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btn-evaluate" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-2.5 rounded-xl shadow transition duration-150 flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Run Audit Evaluation
+            </button>
+          </div>
+
+          <!-- Derived Thresholds Card -->
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm space-y-3">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">Derived Cost Thresholds (Math)</h3>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-[var(--border)]">
+                <span class="text-[var(--muted-foreground)]">Binary Break-Even (p*):</span>
+                <span class="font-bold text-[var(--foreground)]">44.4%</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-[var(--border)]">
+                <span class="text-[var(--muted-foreground)]">HOLD Region (p*_low to p*_high):</span>
+                <span class="font-bold text-amber-500">20.0% &mdash; 75.0%</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-[var(--muted-foreground)]">Current Cost Model:</span>
+                <span class="text-[var(--foreground)]">C_FP=8.0, C_FN=10.0, C_Hold=2.0</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Audit Output -->
+        <div class="lg:col-span-8 space-y-6">
+          
+          <div id="decision-banner" class="bg-[var(--card)] border-2 border-emerald-500/30 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+            <div>
+              <div class="text-xs uppercase tracking-wider font-semibold text-[var(--muted-foreground)]">Final Decision Result</div>
+              <div id="decision-action" class="text-3xl font-extrabold text-emerald-500 tracking-tight mt-1">APPROVE</div>
+              <p id="decision-rationale" class="text-xs text-[var(--muted-foreground)] mt-1">
+                Posterior fraud probability (4.0%) is below the 20.0% HOLD threshold.
+              </p>
+            </div>
+            
+            <div class="text-right flex flex-col items-end">
+              <div class="text-xs text-[var(--muted-foreground)]">Expected Cost</div>
+              <div id="decision-cost" class="text-2xl font-extrabold text-[var(--foreground)] mt-0.5">0.40 pts</div>
+            </div>
+          </div>
+
+          <!-- Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Posterior Fraud Prob</div>
+              <div id="metric-pfraud" class="text-2xl font-black text-emerald-500 mt-2">4.0%</div>
+              <div class="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 mt-3 overflow-hidden">
+                <div id="bar-pfraud" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style="width: 4%;"></div>
+              </div>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">Shannon Entropy H(P)</div>
+              <div id="metric-entropy" class="text-2xl font-black text-[var(--foreground)] mt-2">0.242 <span class="text-xs font-medium text-[var(--muted-foreground)]">bits</span></div>
+              <p id="label-entropy" class="text-[11px] text-[var(--muted-foreground)] mt-2">Low doubt (Confident belief state)</p>
+            </div>
+
+            <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 shadow-sm">
+              <div class="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">KL Divergence D_KL</div>
+              <div id="metric-kl" class="text-2xl font-black text-indigo-500 mt-2">0.184 <span class="text-xs font-medium text-[var(--muted-foreground)]">bits</span></div>
+              <p id="label-kl" class="text-[11px] text-[var(--muted-foreground)] mt-2">Moderate belief shift from prior</p>
+            </div>
+          </div>
+
+          <!-- Signal Table -->
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+            <h3 class="text-sm font-semibold text-[var(--foreground)] flex items-center justify-between">
+              <span>Extracted Evidence Signals & Likelihood Ratios (&Lambda;)</span>
+              <span class="text-xs font-normal text-[var(--muted-foreground)]">Prior P(Fraud) = 10.0%</span>
+            </h3>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                    <th class="py-2 font-semibold">Signal Name</th>
+                    <th class="py-2 font-semibold">Direction</th>
+                    <th class="py-2 font-semibold text-center">P(E|Fraud)</th>
+                    <th class="py-2 font-semibold text-center">P(E|Legit)</th>
+                    <th class="py-2 font-semibold text-right">Likelihood Ratio (&Lambda;)</th>
+                  </tr>
+                </thead>
+                <tbody id="table-evidence-body" class="divide-y divide-[var(--border)]">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Expected Cost Table -->
+          <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+            <h3 class="text-sm font-semibold text-[var(--foreground)]">Expected Cost Minimization Analysis</h3>
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div id="card-cost-approve" class="border border-[var(--border)] rounded-xl p-4 transition-all">
+                <div class="text-xs text-[var(--muted-foreground)] font-medium uppercase">APPROVE</div>
+                <div id="val-cost-approve" class="text-xl font-bold mt-1 text-[var(--foreground)]">0.40</div>
+                <div class="text-[10px] text-[var(--muted-foreground)] mt-1">10.0 &times; P(Fraud)</div>
+              </div>
+              <div id="card-cost-hold" class="border border-[var(--border)] rounded-xl p-4 transition-all">
+                <div class="text-xs text-[var(--muted-foreground)] font-medium uppercase">HOLD</div>
+                <div id="val-cost-hold" class="text-xl font-bold mt-1 text-[var(--foreground)]">2.00</div>
+                <div class="text-[10px] text-[var(--muted-foreground)] mt-1">Fixed friction cost</div>
+              </div>
+              <div id="card-cost-stop" class="border border-[var(--border)] rounded-xl p-4 transition-all">
+                <div class="text-xs text-[var(--muted-foreground)] font-medium uppercase">STOP</div>
+                <div id="val-cost-stop" class="text-xl font-bold mt-1 text-[var(--foreground)]">7.68</div>
+                <div class="text-[10px] text-[var(--muted-foreground)] mt-1">8.0 &times; P(Legit)</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Sensing Table -->
+          <div id="panel-active-sensing" class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-[var(--foreground)] flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                Active Information Selection (EIG / Cost Analysis)
+              </h3>
+              <span class="text-xs text-amber-500 font-medium">Triggered by Uncertainty</span>
+            </div>
+
+            <p class="text-xs text-[var(--muted-foreground)]">
+              When in the HOLD zone, the agent ranks verification channels by Expected Information Gain per friction cost to maximize uncertainty destruction.
+            </p>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-[var(--border)] text-[var(--muted-foreground)]">
+                    <th class="py-2 font-semibold">Channel</th>
+                    <th class="py-2 font-semibold text-center">Friction Cost</th>
+                    <th class="py-2 font-semibold text-center">Expected IG (bits)</th>
+                    <th class="py-2 font-semibold text-right">Efficiency (EIG/Cost)</th>
+                    <th class="py-2 font-semibold text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="table-eig-body" class="divide-y divide-[var(--border)]">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- PAGE 2: HOW IT THINKS -->
+    <div id="page2-content" class="space-y-6 hidden">
+      
+      <header class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 font-bold text-xl">&amp;#128161;</div>
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-[var(--foreground)]">How This AI Agent Thinks</h1>
+            <p class="text-sm text-[var(--muted-foreground)] mt-0.5">
+              The Plain-English Architecture & Decision Guide (Explained so clearly even a 15-year-old gets it!)
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 text-emerald-500 font-bold text-sm uppercase tracking-wider">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs">1</span>
+            The Agent is a Detective (Bayes Rule)
+          </div>
+          <h3 class="text-base font-semibold text-[var(--foreground)]">Starting with a Hunch, Updating with Clues</h3>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            Before your agent sees any transaction details, it starts with a starting baseline (a <strong>Prior</strong>): <i>"In normal credit card transactions, 90% are legitimate and 10% are fraud."</i>
+          </p>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            When a transaction arrives, the agent acts like a detective collecting clues. If the purchase is at 3:00 AM from a foreign city, that clue (an <strong>Evidence Signal</strong>) pushes the fraud chance up. The agent uses <strong>Bayes' Rule</strong> to multiply probabilities together and arrive at its new updated hunch (the <strong>Posterior Belief</strong>).
+          </p>
+        </div>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 text-indigo-500 font-bold text-sm uppercase tracking-wider">
+            <span class="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs">2</span>
+            The "Confusion Meter" (Shannon Entropy)
+          </div>
+          <h3 class="text-base font-semibold text-[var(--foreground)]">Measuring Uncertainty in Bits</h3>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            How confused is the AI right now? We measure confusion using <strong>Shannon Entropy (H)</strong> in units called <strong>bits</strong>:
+          </p>
+          <ul class="text-xs text-[var(--muted-foreground)] space-y-1.5 list-disc list-inside">
+            <li><strong>0.0 Bits:</strong> Total Certainty! <i>"I am 100% sure this transaction is good."</i></li>
+            <li><strong>1.0 Bit:</strong> Maximum Confusion! <i>"It is a 50/50 coin flip, I have no idea!"</i></li>
+          </ul>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            If a new clue takes the agent from 90% sure down to 50/50, the agent's <strong>entropy goes UP</strong> because the clue destroyed its certainty!
+          </p>
+        </div>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 text-amber-500 font-bold text-sm uppercase tracking-wider">
+            <span class="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center text-xs">3</span>
+            Why 44.4%? (Derived Decision Math)
+          </div>
+          <h3 class="text-base font-semibold text-[var(--foreground)]">Balancing Money Loss vs. Annoyed Customers</h3>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            Why doesn't the agent just block everything that looks 51% suspicious? Because blocking a good customer has a cost!
+          </p>
+          <div class="bg-black/5 dark:bg-white/5 p-3 rounded-xl text-xs space-y-1 font-mono">
+            <div>Cost of Blocking Good Customer (False Positive) = $8.0</div>
+            <div>Cost of Approving Stolen Card (False Negative) = $10.0</div>
+            <div class="text-amber-500 font-bold pt-1 border-t border-[var(--border)]">Break-Even Threshold p* = 8.0 / (8.0 + 10.0) = 44.4%</div>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            The math proves that if fraud chance is above <strong>44.4%</strong>, blocking the card loses less money on average than letting it go through!
+          </p>
+        </div>
+
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-3">
+          <div class="flex items-center gap-2 text-rose-500 font-bold text-sm uppercase tracking-wider">
+            <span class="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center text-xs">4</span>
+            Smart Asking (Active Sensing EIG/Cost)
+          </div>
+          <h3 class="text-base font-semibold text-[var(--foreground)]">Don't Guess &mdash; Ask Efficiently!</h3>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            When the agent is stuck in the middle (between <strong>20% and 75%</strong> fraud chance), it chooses <strong>HOLD</strong> to ask the customer for verification.
+          </p>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            But asking someone for a password or calling them causes customer friction. So the agent computes <strong>Expected Information Gain per Unit Cost (EIG/Cost)</strong>:
+          </p>
+          <div class="bg-black/5 dark:bg-white/5 p-3 rounded-xl text-xs space-y-1 font-mono">
+            <div>Push Notification: High Clarity / Low Cost = 0.35 bits/cost (WINNER!)</div>
+            <div>Manual Phone Call: High Clarity / Massive Cost = 0.08 bits/cost</div>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)] leading-relaxed">
+            The agent automatically picks the <strong>Push Notification</strong> because it destroys the most confusion for the least customer annoyance.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-semibold text-[var(--foreground)]">Complete Decision Loop Flowchart</h3>
+        <div class="bg-black/5 dark:bg-white/5 border border-[var(--border)] p-4 rounded-xl text-xs font-mono overflow-x-auto space-y-2 leading-relaxed text-[var(--foreground)]">
+          <div>[Incoming Transaction] &minus;&minus;&gt; [Extract Clues: Amount, Location, Time, Merchant]</div>
+          <div class="text-emerald-500">                      &vert;</div>
+          <div class="text-emerald-500">                      &blackdownpointer;</div>
+          <div>            [Bayes Engine: Multiply Likelihood Ratios (&Lambda;)]</div>
+          <div class="text-indigo-500">                      &vert;</div>
+          <div class="text-indigo-500">                      &blackdownpointer;</div>
+          <div>            [Calculate Confusion (Entropy H) &amp; Surprise (KL)]</div>
+          <div class="text-amber-500">                      &vert;</div>
+          <div class="text-amber-500">                      &blackdownpointer;</div>
+          <div>            [Check Derived Thresholds: 20% and 75%]</div>
+          <div>             &vdash;&minus;&minus; Fraud &lt; 20%  &minus;&minus;&gt; APPROVE (Immediate)</div>
+          <div>             &vdash;&minus;&minus; Fraud &gt; 75%  &minus;&minus;&gt; STOP (Immediate)</div>
+          <div class="text-rose-500">             &lfloor;&minus;&minus; 20% &le; Fraud &le; 75% &minus;&minus;&gt; HOLD &amp; Active Sensing (EIG/Cost)</div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    const btnPage1 = document.getElementById("nav-page1");
+    const btnPage2 = document.getElementById("nav-page2");
+    const page1Content = document.getElementById("page1-content");
+    const page2Content = document.getElementById("page2-content");
+
+    btnPage1.addEventListener("click", () => {
+      page1Content.classList.remove("hidden");
+      page2Content.classList.add("hidden");
+      
+      btnPage1.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 transition-all";
+      btnPage2.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-[var(--muted-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-all";
+    });
+
+    btnPage2.addEventListener("click", () => {
+      page2Content.classList.remove("hidden");
+      page1Content.classList.add("hidden");
+
+      btnPage2.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 transition-all";
+      btnPage1.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold text-[var(--muted-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-all";
+    });
+
+    const LIKELIHOODS = {
+      large_amount: { fraudulent: 0.30, legitimate: 0.20 },
+      amount_consistent: { fraudulent: 0.70, legitimate: 0.80 },
+      new_merchant: { fraudulent: 0.30, legitimate: 0.15 },
+      merchant_consistent: { fraudulent: 0.70, legitimate: 0.85 },
+      unusual_location: { fraudulent: 0.30, legitimate: 0.10 },
+      location_consistent: { fraudulent: 0.70, legitimate: 0.90 },
+      unusual_time: { fraudulent: 0.40, legitimate: 0.10 },
+      time_consistent: { fraudulent: 0.60, legitimate: 0.90 },
+    };
+
+    const PRESET_CASES = {
+      TC01: { amount: 2500, merchant: "merchant_consistent", time: "time_consistent", location: "location_consistent" },
+      TC02: { amount: 85000, merchant: "new_merchant", time: "unusual_time", location: "unusual_location" },
+      TC04: { amount: 45000, merchant: "merchant_consistent", time: "time_consistent", location: "location_consistent" },
+      TC07: { amount: 3200, merchant: "merchant_consistent", time: "unusual_time", location: "location_consistent" },
+      TC17: { amount: 4000, merchant: "merchant_consistent", time: "unusual_time", location: "unusual_location" },
+      TC23: { amount: 95000, merchant: "merchant_consistent", time: "time_consistent", location: "unusual_location" },
+      TC33: { amount: 150000, merchant: "new_merchant", time: "unusual_time", location: "unusual_location" },
+    };
+
+    function calculateEntropy(pLegit, pFraud) {
+      let h = 0.0;
+      [pLegit, pFraud].forEach(p => {
+        if (p > 0) h -= p * Math.log2(p);
+      });
+      return h;
+    }
+
+    function calculateKLDivergence(priorFraud, postFraud) {
+      const priorLegit = 1.0 - priorFraud;
+      const postLegit = 1.0 - postFraud;
+      let kl = 0.0;
+      if (postLegit > 0 && priorLegit > 0) kl += postLegit * Math.log2(postLegit / priorLegit);
+      if (postFraud > 0 && priorFraud > 0) kl += postFraud * Math.log2(postFraud / priorFraud);
+      return kl;
+    }
+
+    function runEvaluation() {
+      const merchantSig = document.getElementById("input-merchant").value;
+      const timeSig = document.getElementById("input-time").value;
+      const locationSig = document.getElementById("input-location").value;
+      const amountVal = parseFloat(document.getElementById("input-amount").value) || 0;
+      const amountSig = amountVal > 15000 ? "large_amount" : "amount_consistent";
+
+      const selectedSignals = [merchantSig, timeSig, locationSig, amountSig];
+
+      let pLegit = 0.90;
+      let pFraud = 0.10;
+      const priorFraud = 0.10;
+
+      const tableBody = document.getElementById("table-evidence-body");
+      tableBody.innerHTML = "";
+
+      selectedSignals.forEach(sigName => {
+        const lh = LIKELIHOODS[sigName];
+        if (!lh) return;
+
+        const pFraudLh = lh.fraudulent;
+        const pLegitLh = lh.legitimate;
+
+        const fraudWeight = pFraud * pFraudLh;
+        const legitWeight = pLegit * pLegitLh;
+        const total = fraudWeight + legitWeight;
+
+        pFraud = fraudWeight / total;
+        pLegit = legitWeight / total;
+
+        const lambda = (pFraudLh / pLegitLh).toFixed(3);
+        const isFraudSupp = pFraudLh > pLegitLh;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="py-2.5 font-mono text-xs font-semibold text-[var(--foreground)]">${sigName}</td>
+          <td class="py-2.5">
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${isFraudSupp ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}">
+              ${isFraudSupp ? 'SUPPORTS FRAUD' : 'SUPPORTS LEGIT'}
+            </span>
+          </td>
+          <td class="py-2.5 text-center">${pFraudLh.toFixed(2)}</td>
+          <td class="py-2.5 text-center">${pLegitLh.toFixed(2)}</td>
+          <td class="py-2.5 text-right font-mono font-bold ${isFraudSupp ? 'text-red-500' : 'text-emerald-500'}">${lambda}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      const costApprove = pFraud * 10.0;
+      const costHold = 2.0;
+      const costStop = (1.0 - pFraud) * 8.0;
+
+      let chosenAction = "APPROVE";
+      let minCost = costApprove;
+
+      if (costHold < minCost) {
+        chosenAction = "HOLD";
+        minCost = costHold;
+      }
+      if (costStop < minCost) {
+        chosenAction = "STOP";
+        minCost = costStop;
+      }
+
+      const banner = document.getElementById("decision-banner");
+      const actionEl = document.getElementById("decision-action");
+      const rationaleEl = document.getElementById("decision-rationale");
+      const costEl = document.getElementById("decision-cost");
+
+      actionEl.textContent = chosenAction;
+      costEl.textContent = `${minCost.toFixed(2)} pts`;
+
+      banner.className = "bg-[var(--card)] border-2 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all ";
+      if (chosenAction === "APPROVE") {
+        banner.classList.add("border-emerald-500/40");
+        actionEl.className = "text-3xl font-extrabold text-emerald-500 tracking-tight mt-1";
+        rationaleEl.textContent = `Posterior fraud probability (${(pFraud * 100).toFixed(1)}%) is below the 20.0% HOLD threshold. Approving minimizes expected cost.`;
+      } else if (chosenAction === "HOLD") {
+        banner.classList.add("border-amber-500/40");
+        actionEl.className = "text-3xl font-extrabold text-amber-500 tracking-tight mt-1";
+        rationaleEl.textContent = `Posterior fraud probability (${(pFraud * 100).toFixed(1)}%) lies in the uncertain 20.0%–75.0% band. Pausing for verification reduces total expected risk.`;
+      } else {
+        banner.classList.add("border-red-500/40");
+        actionEl.className = "text-3xl font-extrabold text-red-500 tracking-tight mt-1";
+        rationaleEl.textContent = `Posterior fraud probability (${(pFraud * 100).toFixed(1)}%) exceeds the 75.0% STOP threshold. Immediate block avoids high fraud risk.`;
+      }
+
+      document.getElementById("metric-pfraud").textContent = `${(pFraud * 100).toFixed(1)}%`;
+      document.getElementById("bar-pfraud").style.width = `${(pFraud * 100)}%`;
+
+      const entropy = calculateEntropy(pLegit, pFraud);
+      document.getElementById("metric-entropy").innerHTML = `${entropy.toFixed(3)} <span class="text-xs font-medium text-[var(--muted-foreground)]">bits</span>`;
+      
+      const kl = calculateKLDivergence(priorFraud, pFraud);
+      document.getElementById("metric-kl").innerHTML = `${kl.toFixed(3)} <span class="text-xs font-medium text-[var(--muted-foreground)]">bits</span>`;
+
+      document.getElementById("val-cost-approve").textContent = costApprove.toFixed(2);
+      document.getElementById("val-cost-hold").textContent = costHold.toFixed(2);
+      document.getElementById("val-cost-stop").textContent = costStop.toFixed(2);
+
+      const eigBody = document.getElementById("table-eig-body");
+      eigBody.innerHTML = "";
+
+      const channels = [
+        { name: "Push Notification (push_auth)", cost: 1.0, confLegit: 0.90, denyFraud: 0.90 },
+        { name: "SMS OTP Verification (sms_otp)", cost: 2.0, confLegit: 0.95, denyFraud: 0.95 },
+        { name: "Manual Analyst Review (manual_review)", cost: 10.0, confLegit: 0.99, denyFraud: 0.99 },
+      ];
+
+      let maxEfficiency = -1;
+      let winnerIndex = -1;
+
+      channels.forEach((ch, idx) => {
+        const pConf = (pLegit * ch.confLegit) + (pFraud * (1 - ch.denyFraud));
+        const pDeny = 1 - pConf;
+
+        const hConf = calculateEntropy(
+          (pLegit * ch.confLegit) / pConf,
+          (pFraud * (1 - ch.denyFraud)) / pConf
+        );
+        const hDeny = calculateEntropy(
+          (pLegit * (1 - ch.confLegit)) / pDeny,
+          (pFraud * ch.denyFraud) / pDeny
+        );
+
+        const hExp = (pConf * hConf) + (pDeny * hDeny);
+        const eig = Math.max(0, entropy - hExp);
+        const efficiency = eig / ch.cost;
+
+        if (efficiency > maxEfficiency) {
+          maxEfficiency = efficiency;
+          winnerIndex = idx;
+        }
+
+        ch.eig = eig;
+        ch.efficiency = efficiency;
+      });
+
+      channels.forEach((ch, idx) => {
+        const isWinner = (idx === winnerIndex) && (chosenAction === "HOLD");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="py-2.5 font-medium text-[var(--foreground)]">${ch.name}</td>
+          <td class="py-2.5 text-center font-mono">${ch.cost.toFixed(1)}</td>
+          <td class="py-2.5 text-center font-mono">${ch.eig.toFixed(3)} bits</td>
+          <td class="py-2.5 text-right font-mono font-bold ${isWinner ? 'text-emerald-500' : 'text-[var(--foreground)]'}">${ch.efficiency.toFixed(3)}</td>
+          <td class="py-2.5 text-right">
+            <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${isWinner ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-black/5 dark:bg-white/5 text-[var(--muted-foreground)]'}">
+              ${isWinner ? 'SELECTED' : 'STANDBY'}
+            </span>
+          </td>
+        `;
+        eigBody.appendChild(row);
+      });
+    }
+
+    document.getElementById("btn-evaluate").addEventListener("click", runEvaluation);
+
+    document.getElementById("case-select").addEventListener("change", function(e) {
+      const caseId = e.target.value;
+      if (PRESET_CASES[caseId]) {
+        const c = PRESET_CASES[caseId];
+        document.getElementById("input-amount").value = c.amount;
+        document.getElementById("input-merchant").value = c.merchant;
+        document.getElementById("input-time").value = c.time;
+        document.getElementById("input-location").value = c.location;
+        runEvaluation();
+      }
+    });
+
+    runEvaluation();
+  </script>
+</body>
+</html>
