@@ -1,6 +1,34 @@
-from transaction_agent import VerificationResponse
-from verification import finalize_decision, request_verification, record_verification
-from transaction_agent import Action, Belief, CostModel
+import pytest
+from transaction_agent import VerificationResponse, Action, Belief, CostModel
+from verification import (
+    finalize_decision,
+    request_verification,
+    record_verification,
+    calculate_expected_information_gain,
+    select_best_verification_action,
+)
+
+
+def test_calculate_expected_information_gain_positive_for_uncertain_belief():
+    uncertain_belief = Belief(legitimate_probability=0.50, fraudulent_probability=0.50)
+    eig_sms = calculate_expected_information_gain(uncertain_belief, "sms_otp")
+    assert eig_sms > 0.5  # Significant reduction in entropy
+
+
+def test_select_best_verification_action_selects_highest_efficiency():
+    uncertain_belief = Belief(legitimate_probability=0.50, fraudulent_probability=0.50)
+    best_type, eig, efficiency = select_best_verification_action(uncertain_belief)
+    # push_auth (cost=1.0) or sms_otp (cost=2.0) vs manual_review (cost=10.0)
+    assert best_type in ["push_auth", "sms_otp"]
+    assert efficiency > 0.10
+
+
+def test_select_best_verification_action_returns_none_for_certain_belief():
+    certain_belief = Belief(legitimate_probability=1.0, fraudulent_probability=0.0)
+    best_type, eig, efficiency = select_best_verification_action(certain_belief)
+    assert best_type is None
+    assert eig == 0.0
+
 
 def test_request_verification_creates_pending_verification():
     pending = request_verification("T001")

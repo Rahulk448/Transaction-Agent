@@ -3,8 +3,47 @@
 import csv
 from dataclasses import dataclass
 from transaction_agent import Action, Belief, Evidence, EvidenceDirection
-from belief import update_belief
+from belief import update_belief, calculate_entropy, calculate_kl_divergence
 from decision import calculate_expected_cost, make_decision, DEFAULT_COST_MODEL
+from verification import calculate_expected_information_gain, select_best_verification_action
+
+
+def calculate_ece(
+    predictions: list[float],
+    actual_labels: list[int],
+    num_bins: int = 10,
+) -> float:
+    """Calculate Expected Calibration Error (ECE) across probability bins."""
+    if not predictions or len(predictions) != len(actual_labels):
+        return 0.0
+
+    total_samples = len(predictions)
+    bin_boundaries = [i / num_bins for i in range(num_bins + 1)]
+    ece = 0.0
+
+    for i in range(num_bins):
+        bin_lower = bin_boundaries[i]
+        bin_upper = bin_boundaries[i + 1]
+
+        # Samples in this probability bin
+        in_bin = [
+            (p, y)
+            for p, y in zip(predictions, actual_labels)
+            if (bin_lower <= p < bin_upper) or (i == num_bins - 1 and bin_lower <= p <= bin_upper)
+        ]
+
+        if not in_bin:
+            continue
+
+        bin_size = len(in_bin)
+        avg_confidence = sum(p for p, _ in in_bin) / bin_size
+        avg_accuracy = sum(y for _, y in in_bin) / bin_size
+
+        bin_error = abs(avg_accuracy - avg_confidence)
+        ece += (bin_size / total_samples) * bin_error
+
+    return ece
+
 
 
 @dataclass
@@ -233,6 +272,30 @@ def print_evaluation_report(results: list[CaseResult]):
     print("=" * 115)
 
 
+def print_probabilistic_summary(results: list[CaseResult]):
+    """Print Week 2 Probabilistic & Information-Theoretic Metrics."""
+    preds = [r.updated_belief.fraudulent_probability for r in results]
+    labels = [1 if "fraud" in r.hidden_state.lower() else 0 for r in results]
+
+    ece = calculate_ece(preds, labels)
+
+    entropies = [calculate_entropy(r.updated_belief) for r in results]
+    kl_divs = [calculate_kl_divergence(r.initial_belief, r.updated_belief) for r in results]
+
+    avg_entropy = sum(entropies) / len(entropies) if entropies else 0.0
+    avg_kl = sum(kl_divs) / len(kl_divs) if kl_divs else 0.0
+
+    print("\n" + "=" * 115)
+    print("WEEK 2 PROBABILISTIC & INFORMATION-THEORETIC SUMMARY METRICS")
+    print("=" * 115)
+    print(f"Expected Calibration Error (ECE):       {ece:.4f}")
+    print(f"Mean Posterior Entropy (H):            {avg_entropy:.4f} bits")
+    print(f"Mean KL Divergence D_KL(Q || P):       {avg_kl:.4f} bits")
+    print("=" * 115 + "\n")
+
+
 if __name__ == "__main__":
     results = evaluate_dataset()
     print_evaluation_report(results)
+    print_probabilistic_summary(results)
+

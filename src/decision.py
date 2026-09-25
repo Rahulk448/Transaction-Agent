@@ -10,6 +10,54 @@ DEFAULT_COST_MODEL = CostModel(
 )
 
 
+def derive_binary_threshold(cost_model: CostModel = DEFAULT_COST_MODEL) -> float:
+    """Derive binary decision threshold p* between APPROVE and STOP.
+
+    p* = C_FP / (C_FP + C_FN)
+    where C_FP is cost of stopping legitimate, and C_FN is cost of approving fraud.
+    """
+    c_fp = cost_model.stop_legitimate - cost_model.approve_legitimate
+    c_fn = cost_model.approve_fraudulent - cost_model.stop_fraudulent
+
+    denom = c_fp + c_fn
+    if denom == 0:
+        return 0.5
+    return c_fp / denom
+
+
+def derive_hold_thresholds(
+    cost_model: CostModel = DEFAULT_COST_MODEL,
+) -> tuple[float | None, float | None]:
+    """Derive lower and upper probability thresholds where HOLD has the lowest expected cost.
+
+    Returns (p_low, p_high). If HOLD is never optimal, returns (None, None).
+    """
+    # Lower threshold: EC(APPROVE) = EC(HOLD)
+    # (1-p)*c_app_leg + p*c_app_fr = (1-p)*c_hold_leg + p*c_hold_fr
+    num_low = cost_model.hold_legitimate - cost_model.approve_legitimate
+    denom_low = (cost_model.approve_fraudulent - cost_model.hold_fraudulent) + num_low
+
+    if denom_low <= 0:
+        return None, None
+    p_low = num_low / denom_low
+
+    # Upper threshold: EC(HOLD) = EC(STOP)
+    # (1-p)*c_hold_leg + p*c_hold_fr = (1-p)*c_stop_leg + p*c_stop_fr
+    num_high = cost_model.stop_legitimate - cost_model.hold_legitimate
+    denom_high = num_high + (cost_model.hold_fraudulent - cost_model.stop_fraudulent)
+
+    if denom_high <= 0:
+        return None, None
+    p_high = num_high / denom_high
+
+    if p_low >= p_high:
+        # HOLD cost is too high; HOLD is never optimal
+        return None, None
+
+    return p_low, p_high
+
+
+
 def calculate_expected_cost(
     belief: Belief,
     action: Action,
